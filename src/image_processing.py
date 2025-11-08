@@ -21,17 +21,3 @@ def normalize_image(image):
     image_max = image.max()
     normalized = (image - image_min) / (image_max - image_min) * 255
     return normalized.astype(np.uint8)
-
-def get_rank_one_matrices(U, S, Vt, k):
-    """Get the first k rank-one matrices and their cumulative sum."""
-    rank_one_matrices = []
-    cumulative_matrices = []
-    current_sum = np.zeros_like(U @ np.diag(S) @ Vt)
-    
-    for i in range(k):
-        rank_one = S[i] * np.outer(U[:, i], Vt[i, :])
-        rank_one_matrices.append(rank_one)
-        current_sum = current_sum + rank_one
-        cumulative_matrices.append(current_sum.copy())
-    
-    return rank_one_matrices, cumulative_matrices
