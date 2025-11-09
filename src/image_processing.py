@@ -4,15 +4,22 @@ from PIL import Image
 def compress_image(image, k):
     """Compress image using SVD with k components."""
     img_array = np.array(image)
-    compressed_channels = []
     
-    for channel in range(3):
-        channel_data = img_array[:, :, channel]
-        U, S, Vt = np.linalg.svd(channel_data, full_matrices=False)
-        compressed = U[:, :k] @ np.diag(S[:k]) @ Vt[:k, :]
-        compressed_channels.append(compressed)
+    # Check if image is grayscale (2D) or color (3D)
+    if len(img_array.shape) == 2:
+        # Grayscale image
+        U, S, Vt = np.linalg.svd(img_array, full_matrices=False)
+        compressed_image = U[:, :k] @ np.diag(S[:k]) @ Vt[:k, :]
+    else:
+        # Color image (3 channels)
+        compressed_channels = []
+        for channel in range(3):
+            channel_data = img_array[:, :, channel]
+            U, S, Vt = np.linalg.svd(channel_data, full_matrices=False)
+            compressed = U[:, :k] @ np.diag(S[:k]) @ Vt[:k, :]
+            compressed_channels.append(compressed)
+        compressed_image = np.stack(compressed_channels, axis=2)
     
-    compressed_image = np.stack(compressed_channels, axis=2)
     return compressed_image
 
 def normalize_image(image):
